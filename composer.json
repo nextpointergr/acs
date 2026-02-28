@@ -1,0 +1,24 @@
+{
+  "name": "nextpointer/acs",
+  "description": "ACS Courier REST API Client for Laravel 12",
+  "type": "library",
+  "license": "MIT",
+  "autoload": {
+    "psr-4": {
+      "NextPointer\\Acs\\": "src/"
+    }
+  },
+  "require": {
+    "php": "^8.2",
+    "illuminate/support": "^12.0"
+  },
+  "extra": {
+    "laravel": {
+      "providers": [
+        "NextPointer\\Acs\\AcsServiceProvider"
+      ]
+    }
+  },
+  "minimum-stability": "dev",
+  "prefer-stable": true
+}
