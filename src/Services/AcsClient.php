@@ -17,8 +17,6 @@ class AcsClient
                 'User_ID'          => config('acs.user_id'),
                 'User_Password'    => config('acs.user_password'),
                 'Language'         => config('acs.language'),
-                "Billing_Code" => config('acs.billing_code'),
-                "Charge_Type" => 2,
             ], $params),
         ];
 
@@ -30,7 +28,7 @@ class AcsClient
     protected function send(array $payload): Response
     {
         return Http::withHeaders([
-            'acsapikey' => config('acs.api_key'),
+            'ACSApiKey' => config('acs.api_key'),
             'Content-Type' => 'application/json',
         ])
             ->timeout((int) config('acs.timeout', 30))
@@ -48,21 +46,34 @@ class AcsClient
 
         $json = $response->json();
 
+        if (!$json) {
+            throw new AcsException('Invalid JSON response from ACS');
+        }
+
+        if (($json['ACSExecution_HasError'] ?? false) === true) {
+            throw new AcsException(
+                $json['ACSExecutionErrorMessage'] ?? 'Unknown ACS error'
+            );
+        }
+
         $error = data_get(
             $json,
-            'ACSOutputResponce.ACSValueOutput.0.Error_Message'
+            'ACSOutputResponse.ACSValueOutput.0.Error_Message'
         );
 
         if (!empty($error)) {
             throw new AcsException($error);
         }
 
-        return $json;
+        return $json['ACSOutputResponse'] ?? $json;
     }
 
     public function createVoucher(array $data): array
     {
-        return $this->call('ACS_Create_Voucher', $data);
+        return $this->call('ACS_Create_Voucher', array_merge([
+            'Billing_Code' => config('acs.billing_code'),
+            'Charge_Type'  => 2,
+        ], $data));
     }
 
     public function deleteVoucher(string $voucherNo): array
@@ -85,8 +96,10 @@ class AcsClient
 
     public function printVouchers(array $voucherNumbers): array
     {
-        return $this->call('ACS_Print_Vouchers', [
-            'VoucherNumbers' => implode(',', $voucherNumbers),
+        return $this->call('ACS_Print_Voucher', [
+            'Voucher_No' => implode(',', $voucherNumbers),
+            'Print_Type' => 2,
+            'Start_Position' => 1,
         ]);
     }
 }
