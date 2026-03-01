@@ -17,6 +17,8 @@ class AcsClient
                 'User_ID'          => config('acs.user_id'),
                 'User_Password'    => config('acs.user_password'),
                 'Language'         => config('acs.language'),
+                "Billing_Code" => config('acs.billing_code'),
+                "Charge_Type" => 2,
             ], $params),
         ];
 
