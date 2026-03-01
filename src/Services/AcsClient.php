@@ -27,6 +27,9 @@ class AcsClient
 
     protected function send(array $payload): Response
     {
+
+        logger()->info('ACS PAYLOAD:', $payload);
+
         return Http::withHeaders([
             'ACSApiKey' => config('acs.api_key'),
             'Content-Type' => 'application/json',
