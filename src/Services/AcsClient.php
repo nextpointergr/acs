@@ -70,10 +70,10 @@ class AcsClient
 
     public function createVoucher(array $data): array
     {
-        return $this->call('ACS_Create_Voucher', array_merge([
-            'Billing_Code' => config('acs.billing_code'),
-            'Charge_Type'  => 2,
-        ], $data));
+        $data['Billing_Code'] = config('acs.billing_code');
+        $data['Charge_Type']  = 2;
+
+        return $this->call('ACS_Create_Voucher', $data);
     }
 
     public function deleteVoucher(string $voucherNo): array
